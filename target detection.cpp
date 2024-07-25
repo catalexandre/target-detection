@@ -45,6 +45,7 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
             image >> r >> g >> b;
 
             //this is the value that is compared to threshold. 0 <= valueCheck <= 1
+            double valueCheck = r - 0.25 * g - 0.25 * b;
 
             if (functionRGB(r, g, b))
             {
