@@ -28,12 +28,7 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
 
     image >> width >> height >> maxValue;
 
-    std::cout << width << ' ' << height << ' ' << maxValue << endl;
-
     binaryImage << "P1" << endl << width << ' ' << height << endl;
-
-    double* luminosityData = new double[width * height];
-    int* maskData = new int[width * height];
 
     for (int i = 0; i < height; i++)
     {
@@ -50,7 +45,6 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
                 binaryImage << 0 << ' ';
             }
 
-
             else
             {
                 binaryImage << 1 << ' ';
@@ -60,6 +54,11 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
 
     image.close();
     binaryImage.close();
+}
+
+void getTargetPosition()
+{
+
 }
 
 int main()
