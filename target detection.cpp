@@ -19,7 +19,6 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
 
     if (!image.is_open())
     {
-        cout << "Encountered an error when opening the input file. Terminating the program" << endl;
         return 1;
     }
 
@@ -44,7 +43,6 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
 
             image >> r >> g >> b;
 
-            //this is the value that is compared to threshold. 0 <= valueCheck <= 1
             double valueCheck = r - 0.25 * g - 0.25 * b;
 
             if (functionRGB(r, g, b))
@@ -66,17 +64,10 @@ int binarize(string name, bool (*functionRGB)(double, double, double))
 
 int main()
 {
+    if (binarize("Blob_DetectionP3", *rSubGB))
+    {
 
-    string inputFileName;
-
-    std::cout << "Name of the picture file (exclude extension): ";
-    std::cin >> inputFileName;
-
-    binarize("Blob_DetectionP3", *rSubGB);
-
-    delete[] maskData;
-
-    std::cout << "pixel sorted";
+    }
 
     return 0;
 }
