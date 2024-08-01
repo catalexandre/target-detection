@@ -1,8 +1,12 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <chrono>
+
+#include "position.h"
 
 using namespace std;
+using namespace std::chrono;
 
 bool rSubGB(double r, double g, double b)
 {
@@ -20,7 +24,7 @@ bool test(double r, double g, double b)
     return (value > threshold) ? true : false;
 }
 
-int* binarize(string name, bool (*functionRGB)(double, double, double))
+int* binarize(string name, bool (*functionRGB)(double, double, double), int &imageWidth, int &imageHeight)
 {
     ifstream image(name + ".ppm");
     ofstream binaryImage(name + "Binary.ppm");
@@ -32,22 +36,19 @@ int* binarize(string name, bool (*functionRGB)(double, double, double))
 
     image.ignore(256, '\n');
 
-    int maxValue, width, height;
+    int maxValue;
 
-    image >> width >> height >> maxValue;
+    image >> imageWidth >> imageHeight >> maxValue;
 
-    int imageSize = width * height;
+    int imageSize = imageWidth * imageHeight;
 
-    int* returnData = new int[imageSize + 2];
+    int* returnData = new int[imageSize];
 
-    returnData[0] = width;
-    returnData[1] = height;
+    binaryImage << "P1" << endl << imageWidth << ' ' << imageHeight << endl;
 
-    binaryImage << "P1" << endl << width << ' ' << height << endl;
-
-    for (int i = 0; i < height; i++)
+    for (int i = 0; i < imageHeight; i++)
     {
-        for (int j = 0; j < width; j++)
+        for (int j = 0; j < imageWidth; j++)
         {
             int r, g, b;
 
@@ -68,7 +69,7 @@ int* binarize(string name, bool (*functionRGB)(double, double, double))
             }
 
             binaryImage << pixelValue << ' ';
-            returnData[i * width + j + 2] = pixelValue;
+            returnData[i * imageWidth + j] = pixelValue;
         }
     }
 
@@ -78,46 +79,38 @@ int* binarize(string name, bool (*functionRGB)(double, double, double))
     return returnData;
 }
 
+position* getTargetPosition(int* imageArray)
+{
+
+
+    return new position(0, 0);
+}
+
 int main()
 {
-    int* binaryImageArray = binarize("Blob_DetectionP3", test);
+    int imageWidth, imageHeight;
+
+    auto start = high_resolution_clock::now();
+
+    int* binaryImageArray = binarize("Blob_DetectionP3", test, imageWidth, imageHeight);
 
     if (binaryImageArray != nullptr)
     {
-        int imageWidth = binaryImageArray[0];
-        int imageHeight = binaryImageArray[1];
-        int imageSize = imageWidth * imageHeight;
+        getTargetPosition(binaryImageArray);
 
-        // Allocate a new array for the actual binary image data
-        int* binaryImageData = new int[imageSize];
-
-        // Copy data from old array to new array
-        for (int i = 0; i < imageSize; i++)
-        {
-            binaryImageData[i] = binaryImageArray[2 + i];
-        }
-
-        // Deallocate the old array
         delete[] binaryImageArray;
-
-        // Print the binary image data
-        for (int i = 0; i < imageHeight; i++)
-        {
-            for (int j = 0; j < imageWidth; j++)
-            {
-                cout << binaryImageData[i * imageWidth + j] << ' ';
-            }
-            cout << endl;
-        }
-
-        // Deallocate the new array
-        delete[] binaryImageData;
     }
 
     else
     {
         cout << "Failed to binarize the image." << endl;
     }
+
+    auto end = high_resolution_clock::now();
+
+    auto duration = duration_cast<milliseconds>(end - start);
+
+    cout << "Time taken: " << duration.count() << " ms" << endl;
 
     return 0;
 }
